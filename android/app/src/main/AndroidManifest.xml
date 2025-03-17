@@ -6,7 +6,6 @@
     
     
     
-    
     <application
         android:label="SaintBook"
         android:name="${applicationName}"

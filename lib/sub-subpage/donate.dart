@@ -17,7 +17,6 @@ Swift Code: ZEIBNGLAXXX
     return Scaffold(
       appBar: AppBar(
         title: const Text('Donate'),
-        
       ),
       body: SingleChildScrollView(
         // Wrap the Column with SingleChildScrollView
@@ -38,7 +37,7 @@ Swift Code: ZEIBNGLAXXX
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 20),
-              Text(
+              SelectableText(
                 bankDetails,
                 style: const TextStyle(fontSize: 16),
               ),

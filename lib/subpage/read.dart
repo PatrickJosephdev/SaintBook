@@ -292,8 +292,10 @@ class _SaintDetailPageState extends State<SaintDetailPage> {
                 onShown: (placementId) => print('Banner shown: $placementId'),
                 onFailed: (placementId, error, message) {
                   print('Banner Ad $placementId failed: $error $message');
-                  bannerAd != null ? StartAppBanner(bannerAd!) : Container();
-                }),
+                  bannerAd != null ? StartAppBanner(bannerAd!) : const SizedBox.shrink();
+                })
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:1438463902.
+            else const SizedBox.shrink(),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
@@ -315,7 +317,7 @@ class _SaintDetailPageState extends State<SaintDetailPage> {
                     style: const TextStyle(fontSize: 16.0, color: Colors.grey),
                   ),
                   const SizedBox(height: 16.0),
-                  bannerAd != null ? StartAppBanner(bannerAd!) : Container(),
+                  bannerAd != null ? StartAppBanner(bannerAd!) : const SizedBox.shrink(),
                   const SizedBox(height: 16.0),
                   Text(
                     widget.saintStory,

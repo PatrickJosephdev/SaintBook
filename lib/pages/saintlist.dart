@@ -1,10 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:saintbook/model/admanager.dart';
 import 'package:saintbook/model/helper.dart';
-
 import 'package:searchbar_animation/searchbar_animation.dart';
 import 'package:flutter_masonry_view/flutter_masonry_view.dart';
 import 'package:saintbook/model/apifetchdata.dart';
@@ -12,7 +10,6 @@ import 'package:saintbook/subpage/read.dart';
 import 'package:saintbook/subpage/watch.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-
 import 'package:startapp_sdk/startapp.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
@@ -30,6 +27,7 @@ class _SaintListState extends State<SaintList> {
   String _error = '';
   var startAppSdk = StartAppSdk();
   StartAppBannerAd? bannerAd;
+  String numberofSaint = '';
 
   Timer? _bannerTimer;
 
@@ -37,6 +35,11 @@ class _SaintListState extends State<SaintList> {
   InterstitialAd? _interstitialAd;
   RewardedAd? _rewardedAd;
 
+  // Pagination variables
+  int _itemsToShow = 20; // Number of items to show initially
+  int _totalItems = 0; // Total number of items fetched
+
+  // Load ads
   _loadBannerAd() {
     BannerAd(
       adUnitId: Adhelper.bannerAdUnitId,
@@ -128,9 +131,6 @@ class _SaintListState extends State<SaintList> {
         ad.dispose();
         _loadRewardedAd();
         _showInterstitialAd();
-        if (placements[AdManager.interstitialVideoAdPlacementId] == true) {
-          _showAd(AdManager.interstitialVideoAdPlacementId);
-        }
       },
     );
 
@@ -225,22 +225,21 @@ class _SaintListState extends State<SaintList> {
   Future<void> loadData({bool forceRefresh = false}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // If forced refresh is true, fetch data from the API
     if (forceRefresh) {
       await _fetchAndSaveData(prefs);
     } else {
-      // Check if data is already saved in Shared Preferences
       String? savedData = prefs.getString('saintList');
 
       if (savedData != null) {
-        // If data exists, decode it and set it to _items and _filteredItems
         setState(() {
           _items = jsonDecode(savedData);
-          _filteredItems = _items; // Initialize filtered items
+          _filteredItems = _items
+              .take(_itemsToShow)
+              .toList(); // Show only the first set of items
+          _totalItems = _items.length; // Store total items
           _isLoading = false;
         });
       } else {
-        // If no data, fetch from API
         await _fetchAndSaveData(prefs);
       }
     }
@@ -251,11 +250,14 @@ class _SaintListState extends State<SaintList> {
       final data = await fetchData(); // Fetch data from the API
       setState(() {
         _items = data;
-        _filteredItems = data; // Initialize filtered items
+        _filteredItems = _items
+            .take(_itemsToShow)
+            .toList(); // Show only the first set of items
+        _totalItems = _items.length; // Store total items
         _isLoading = false;
+        numberofSaint = _totalItems.toString();
       });
 
-      // Save fetched data to Shared Preferences
       await prefs.setString('saintList', jsonEncode(_items));
     } catch (error) {
       setState(() {
@@ -263,6 +265,14 @@ class _SaintListState extends State<SaintList> {
         _isLoading = false;
       });
     }
+  }
+
+  void _loadMoreItems() {
+    setState(() {
+      _itemsToShow += 20; // Increase the number of items to show
+      _filteredItems =
+          _items.take(_itemsToShow).toList(); // Update the filtered items
+    });
   }
 
   @override
@@ -278,30 +288,31 @@ class _SaintListState extends State<SaintList> {
       onComplete: () {
         print('Initialization Complete');
         _loadAds();
-// Start the ad timer
-        _startBannerTimer();
+        // _startBannerTimer();
       },
       onFailed: (error, message) =>
           print('Initialization Failed: $error $message'),
     );
 
-    //for admob
     _loadBannerAd();
     _loadInterstitialAd();
     _loadRewardedAd();
+    // _startBannerTimer();
   }
 
   @override
   void dispose() {
     super.dispose();
     _bannerAd?.dispose();
+    _interstitialAd?.dispose();
+    _rewardedAd?.dispose();
   }
 
   TextEditingController textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    if (_items.isEmpty) {
+    if (_isLoading) {
       return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(),
@@ -309,254 +320,266 @@ class _SaintListState extends State<SaintList> {
       );
     } else {
       return Scaffold(
-          appBar: AppBar(
-            title: const Text('Saint List'),
-            actions: [
-              SearchBarAnimation(
-                textEditingController: textEditingController,
-                searchBoxWidth: 300,
-                isOriginalAnimation: true,
-                trailingWidget: const Icon(Icons.search),
-                secondaryButtonWidget: const Icon(Icons.cancel),
-                buttonWidget: const Icon(
-                  Icons.search,
-                  color: Colors.black,
-                ),
-                hintText: "Search Here",
-                onChanged: (value) {
-                  // Handle search text change
-                  _filteredItems = _items
-                      .where((item) => item['name']
-                          .toLowerCase()
-                          .contains(value.toLowerCase()))
-                      .toList();
-                  setState(() {}); // Update UI with filtered results
-                },
+        appBar: AppBar(
+          title: const Text('Saint List'),
+          actions: [
+            Text(numberofSaint),
+            const SizedBox(width: 12),
+            SearchBarAnimation(
+              textEditingController: textEditingController,
+              searchBoxWidth: 300,
+              isOriginalAnimation: true,
+              trailingWidget: const Icon(Icons.search),
+              secondaryButtonWidget: const Icon(
+                Icons.cancel,
+                color: Colors.black38,
               ),
-              const SizedBox(
-                width: 12,
+              buttonWidget: const Icon(
+                Icons.search,
+                color: Colors.black,
+              ),
+              hintText: "Search Here",
+              onChanged: (value) {
+                _filteredItems = _items
+                    .where((item) => item['name']
+                        .toLowerCase()
+                        .contains(value.toLowerCase()))
+                    .toList();
+                setState(() {}); // Update UI with filtered results
+              },
+            ),
+            const SizedBox(width: 12),
+          ],
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            await loadData(forceRefresh: true);
+          },
+          child: Column(
+            children: [
+              if (_bannerAd != null)
+                SizedBox(
+                  width: _bannerAd!.size.width.toDouble(),
+                  height: _bannerAd!.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd!),
+                )
+              else if (_showBanner)
+                UnityBannerAd(
+                  placementId: AdManager.bannerAdPlacementId,
+                  onLoad: (placementId) => print('Banner loaded: $placementId'),
+                  onClick: (placementId) =>
+                      print('Banner clicked: $placementId'),
+                  onShown: (placementId) => print('Banner shown: $placementId'),
+                  onFailed: (placementId, error, message) {
+                    print('Banner Ad $placementId failed: $error $message');
+                    bannerAd != null
+                        ? StartAppBanner(bannerAd!)
+                        : const SizedBox.shrink();
+                  },
+                )
+              else
+                bannerAd != null
+                    ? StartAppBanner(bannerAd!)
+                    : const SizedBox.shrink(),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      MasonryView(
+                        listOfItem: _filteredItems,
+                        numberOfColumn: calculateNumberOfColumns(context),
+                        itemRadius: 1,
+                        itemPadding: 5,
+                        itemBuilder: (item) {
+                          return GestureDetector(
+                            onTap: () async {
+                              await _incrementClickCount(); // Increment the click count
+
+                              int clickCount =
+                                  await _getClickCount(); // Get the updated count
+
+                              if (clickCount >= 3) {
+                                // Show the interstitial ad
+                                if (placements[AdManager
+                                        .interstitialVideoAdPlacementId] ==
+                                    true) {
+                                  _showAd(
+                                      AdManager.interstitialVideoAdPlacementId);
+                                }
+                                await _resetClickCount(); // Reset the count after showing the ad
+                              }
+
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => SaintDetailPage(
+                              //       saintName: item['name'],
+                              //       saintImage: item['imageUrl'],
+                              //       saintStory: item['story'],
+                              //       videoUrl: item['videoUrl'],
+                              //       celebrationDate: item['celebr ationDate'],
+                              //     ),
+                              //   ),
+                              // );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SaintDetailPage(
+                                    saintName: item['name'],
+                                    saintImage: item['imageUrl'],
+                                    saintStory: item['story'],
+                                    videoUrl: item['videoUrl'],
+                                    celebrationDate: item['celebrationDate'],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0),
+                              child: Stack(
+                                fit: StackFit.passthrough,
+                                alignment: Alignment.center,
+                                children: [
+                                  Image.network(
+                                    item['imageUrl'],
+                                    fit: BoxFit.cover,
+                                  ),
+                                  Positioned(
+                                    top: 20,
+                                    left: 0,
+                                    right: 0,
+                                    child: Center(
+                                      child: Text(
+                                        item['name'],
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 10,
+                                    left: 0,
+                                    right: 0,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            await _incrementClickCount(); // Increment the click count
+
+                                            int clickCount =
+                                                await _getClickCount(); // Get the updated count
+
+                                            if (clickCount >= 3) {
+                                              // Show the interstitial ad
+                                              if (_interstitialAd != null) {
+                                                _showInterstitialAd();
+                                              } else if (placements[AdManager
+                                                      .interstitialVideoAdPlacementId] ==
+                                                  true) {
+                                                _showAd(AdManager
+                                                    .interstitialVideoAdPlacementId);
+                                              } else if (_rewardedAd != null) {
+                                                _showRewardedAd();
+                                              }
+                                              await _resetClickCount(); // Reset the count after showing the ad
+                                            }
+
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SaintDetailPage(
+                                                  saintName: item['name'],
+                                                  saintImage: item['imageUrl'],
+                                                  saintStory: item['story'],
+                                                  videoUrl: item['videoUrl'],
+                                                  celebrationDate:
+                                                      item['celebrationDate'],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.white,
+                                            backgroundColor: Colors.black
+                                                .withOpacity(0.3), // Text color
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 10),
+                                          ),
+                                          child: const Text(
+                                            "Read Now",
+                                            style: TextStyle(fontSize: 9),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            if (_interstitialAd != null) {
+                                              _showInterstitialAd();
+                                            } else if (placements[AdManager
+                                                    .interstitialVideoAdPlacementId] ==
+                                                true) {
+                                              _showAd(AdManager
+                                                  .interstitialVideoAdPlacementId);
+                                            } else if (_rewardedAd != null) {
+                                              _showRewardedAd();
+                                            }
+
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    YoutubePlayerPage(
+                                                  saintName: item['name'],
+                                                  videoUrl: item['videoUrl'],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.white,
+                                            backgroundColor: Colors.black
+                                                .withOpacity(0.3), // Text color
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 10),
+                                          ),
+                                          child: const Text(
+                                            "Play Now",
+                                            style: TextStyle(fontSize: 9),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      if (_itemsToShow <
+                          _totalItems) // Check if there are more items to load
+                        ElevatedButton(
+                          onPressed: _loadMoreItems,
+                          child: const Text('Show More'),
+                        ),
+                      const SizedBox(height: 80),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
-          body: RefreshIndicator(
-            onRefresh: () async {
-              // Refresh data when pulled down
-              await loadData(forceRefresh: true);
-            },
-            child: Column(
-              children: [
-                if (_bannerAd != null)
-                  SizedBox(
-                    width: _bannerAd!.size.width.toDouble(),
-                    height: _bannerAd!.size.height.toDouble(),
-                    child: AdWidget(ad: _bannerAd!),
-                  )
-                else if (_showBanner)
-                  UnityBannerAd(
-                      placementId: AdManager.bannerAdPlacementId,
-                      onLoad: (placementId) =>
-                          print('Banner loaded: $placementId'),
-                      onClick: (placementId) =>
-                          print('Banner clicked: $placementId'),
-                      onShown: (placementId) =>
-                          print('Banner shown: $placementId'),
-                      onFailed: (placementId, error, message) {
-                        print('Banner Ad $placementId failed: $error $message');
-                        bannerAd != null
-                            ? StartAppBanner(bannerAd!)
-                            : Container();
-                      }),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        MasonryView(
-                          listOfItem: _filteredItems,
-                          numberOfColumn: calculateNumberOfColumns(context),
-                          itemRadius: 1,
-                          itemPadding: 5,
-                          itemBuilder: (item) {
-                            return GestureDetector(
-                              onTap: () async {
-                                await _incrementClickCount(); // Increment the click count
-
-                                int clickCount =
-                                    await _getClickCount(); // Get the updated count
-
-                                if (clickCount >= 3) {
-                                  // Show the interstitial ad
-                                  if (placements[AdManager
-                                          .interstitialVideoAdPlacementId] ==
-                                      true) {
-                                    _showAd(AdManager
-                                        .interstitialVideoAdPlacementId);
-                                  }
-                                  await _resetClickCount(); // Reset the count after showing the ad
-                                }
-
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => SaintDetailPage(
-                                      saintName: item['name'],
-                                      saintImage: item['imageUrl'],
-                                      saintStory: item['story'],
-                                      videoUrl: item['videoUrl'],
-                                      celebrationDate: item['celebrationDate'],
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10.0),
-                                child: Stack(
-                                    fit: StackFit.passthrough,
-                                    alignment: Alignment.center,
-                                    children: [
-                                      Image.network(
-                                        item['imageUrl'],
-                                        fit: BoxFit.cover,
-                                      ),
-                                      Positioned(
-                                          top: 20,
-                                          left: 0,
-                                          right: 0,
-                                          child: Center(
-                                            child: Text(
-                                              item['name'],
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                          )),
-                                      Positioned(
-                                          bottom: 10,
-                                          left: 0,
-                                          right: 0,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              ElevatedButton(
-                                                onPressed: () async {
-                                                  await _incrementClickCount(); // Increment the click count
-
-                                                  int clickCount =
-                                                      await _getClickCount(); // Get the updated count
-
-                                                  if (clickCount >= 3) {
-                                                    // Show the interstitial ad
-                                                    if (_interstitialAd !=
-                                                        null) {
-                                                      _showInterstitialAd();
-                                                    } else if (placements[AdManager
-                                                            .interstitialVideoAdPlacementId] ==
-                                                        true) {
-                                                      _showAd(AdManager
-                                                          .interstitialVideoAdPlacementId);
-                                                    } else if (_rewardedAd !=
-                                                        null) {
-                                                      _showRewardedAd();
-                                                    }
-                                                    await _resetClickCount(); // Reset the count after showing the ad
-                                                  }
-
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          SaintDetailPage(
-                                                        saintName: item['name'],
-                                                        saintImage:
-                                                            item['imageUrl'],
-                                                        saintStory:
-                                                            item['story'],
-                                                        videoUrl:
-                                                            item['videoUrl'],
-                                                        celebrationDate: item[
-                                                            'celebrationDate'],
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  foregroundColor: Colors.white,
-                                                  backgroundColor: Colors.black
-                                                      .withOpacity(
-                                                          0.3), // Text color
-                                                  padding: const EdgeInsets
-                                                      .symmetric(vertical: 10),
-                                                ),
-                                                child: const Text(
-                                                  "Read Now",
-                                                  style: TextStyle(fontSize: 9),
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              ElevatedButton(
-                                                onPressed: () {
-                                                  if (_interstitialAd !=
-                                                        null) {
-                                                      _showInterstitialAd();
-                                                    } else if (placements[AdManager
-                                                            .interstitialVideoAdPlacementId] ==
-                                                        true) {
-                                                      _showAd(AdManager
-                                                          .interstitialVideoAdPlacementId);
-                                                    } else if (_rewardedAd !=
-                                                        null) {
-                                                      _showRewardedAd();
-                                                    }
-                                                    
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          YoutubePlayerPage(
-                                                              saintName:
-                                                                  item['name'],
-                                                              videoUrl: item[
-                                                                  'videoUrl']),
-                                                    ),
-                                                  );
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  foregroundColor: Colors.white,
-                                                  backgroundColor: Colors.black
-                                                      .withOpacity(
-                                                          0.3), // Text color
-                                                  padding: const EdgeInsets
-                                                      .symmetric(vertical: 10),
-                                                ),
-                                                child: const Text(
-                                                  "Play Now",
-                                                  style: TextStyle(fontSize: 9),
-                                                ),
-                                              ),
-                                            ],
-                                          )),
-                                    ]),
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(
-                          height: 80,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ));
+        ),
+      );
     }
   }
 
   int calculateNumberOfColumns(BuildContext context) {
-    // Adjust this logic based on your desired minimum and maximum columns
     final double screenWidth = MediaQuery.of(context).size.width;
 
     if (screenWidth >= 1000) return 6;
@@ -568,14 +591,14 @@ class _SaintListState extends State<SaintList> {
     return 1;
   }
 
-  void _startBannerTimer() {
-    _bannerTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
-      if (_showBanner) {
-        _loadAd(AdManager.bannerAdPlacementId);
-        _loadBannerAd(); // Refresh the banner ad
-      } else {
-        loadbannerAd();
-      }
-    });
-  }
+  // void _startBannerTimer() {
+  //   _bannerTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+  //     if (_showBanner) {
+  //       _loadAd(AdManager.bannerAdPlacementId);
+  //       _loadBannerAd(); // Refresh the banner ad
+  //     } else {
+  //       loadbannerAd();
+  //     }
+  //   });
+  // }
 }

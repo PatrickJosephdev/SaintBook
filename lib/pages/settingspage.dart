@@ -27,7 +27,7 @@ class _SettingsPageState extends State<SettingsPage> {
     BannerAd(
       adUnitId: Adhelper.bannerAdUnitId,
       request: const AdRequest(),
-      size: AdSize.leaderboard,
+      size: AdSize.mediumRectangle,
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           setState(() {
@@ -55,8 +55,8 @@ class _SettingsPageState extends State<SettingsPage> {
     }).onError((error, stackTrace) {
       debugPrint("Error loading Banner ad: $error");
       Future.delayed(const Duration(seconds: 5), () {
-            loadbannerAd();
-          });
+        loadbannerAd();
+      });
     });
   }
 

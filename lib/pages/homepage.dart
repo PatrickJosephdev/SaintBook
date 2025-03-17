@@ -44,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
     BannerAd(
       adUnitId: Adhelper.bannerAdUnitId,
       request: const AdRequest(),
-      size: AdSize.largeBanner,
+      size: AdSize.mediumRectangle,
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           setState(() {
@@ -379,7 +379,7 @@ class _MyHomePageState extends State<MyHomePage> {
         print('Initialization Complete');
         _loadAds();
         _startAdTimer(); // Start the ad timer
-        _startBannerTimer();
+        // _startBannerTimer();
       },
       onFailed: (error, message) =>
           print('Initialization Failed: $error $message'),
@@ -625,9 +625,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                           'Banner Ad $placementId failed: $error $message');
                                       bannerAd != null
                                           ? StartAppBanner(bannerAd!)
-                                          : Container();
+                                          : const SizedBox.shrink();
                                     }),
-                              ),
+                              )
+                            else
+                              bannerAd != null
+                                  ? StartAppBanner(bannerAd!)
+                                  : const SizedBox.shrink(),
 
                             // bannerAd != null
                             //     ? StartAppBanner(bannerAd!)
@@ -692,42 +696,33 @@ class _MyHomePageState extends State<MyHomePage> {
                             const SizedBox(
                               height: 20,
                             ),
-                            const SizedBox(
-                              height: 20,
-                            ),
+
                             const Text(
                               'Daily Mass',
                               style: TextStyle(fontSize: 20),
                             ),
-                            if (_bannerAd != null)
-                              Center(
-                                child: SizedBox(
-                                  width: _bannerAd!.size.width.toDouble(),
-                                  height: _bannerAd!.size.height.toDouble(),
-                                  child: AdWidget(ad: _bannerAd!),
-                                ),
-                              )
-                            else if (_showBanner)
-                              Center(
-                                child: UnityBannerAd(
-                                    placementId: AdManager.bannerAdPlacementId,
-                                    onLoad: (placementId) =>
-                                        print('Banner loaded: $placementId'),
-                                    onClick: (placementId) =>
-                                        print('Banner clicked: $placementId'),
-                                    onShown: (placementId) =>
-                                        print('Banner shown: $placementId'),
-                                    onFailed: (placementId, error, message) {
-                                      print(
-                                          'Banner Ad $placementId failed: $error $message');
-                                      bannerAd != null
-                                          ? StartAppBanner(bannerAd!)
-                                          : Container();
-                                    }),
-                              ),
-                            const SizedBox(
-                              height: 10,
-                            ),
+                            // if (_showBanner)
+                            //   Center(
+                            //     child: UnityBannerAd(
+                            //         placementId: AdManager.bannerAdPlacementId,
+                            //         onLoad: (placementId) =>
+                            //             print('Banner loaded: $placementId'),
+                            //         onClick: (placementId) =>
+                            //             print('Banner clicked: $placementId'),
+                            //         onShown: (placementId) =>
+                            //             print('Banner shown: $placementId'),
+                            //         onFailed: (placementId, error, message) {
+                            //           print(
+                            //               'Banner Ad $placementId failed: $error $message');
+                            //           bannerAd != null
+                            //               ? StartAppBanner(bannerAd!)
+                            //               : const SizedBox.shrink();
+                            //         }),
+                            //   )
+                            //   else bannerAd != null
+                            //               ? StartAppBanner(bannerAd!)
+                            //               : const SizedBox.shrink(),
+
                             if (massList.isNotEmpty)
                               DailyMassWidget(
                                 imageUrl: massList[0]['imageUrl'] ??
@@ -770,27 +765,29 @@ class _MyHomePageState extends State<MyHomePage> {
                               'Daily Message',
                               style: TextStyle(fontSize: 20),
                             ),
-                            if (_showBanner)
-                              Center(
-                                child: UnityBannerAd(
-                                    placementId: AdManager.bannerAdPlacementId,
-                                    onLoad: (placementId) =>
-                                        print('Banner loaded: $placementId'),
-                                    onClick: (placementId) =>
-                                        print('Banner clicked: $placementId'),
-                                    onShown: (placementId) =>
-                                        print('Banner shown: $placementId'),
-                                    onFailed: (placementId, error, message) {
-                                      print(
-                                          'Banner Ad $placementId failed: $error $message');
-                                      bannerAd != null
-                                          ? StartAppBanner(bannerAd!)
-                                          : Container();
-                                    }),
-                              ),
-                            const SizedBox(
-                              height: 10,
-                            ),
+                            // if (_showBanner)
+                            //   Center(
+                            //     child: UnityBannerAd(
+                            //         placementId: AdManager.bannerAdPlacementId,
+                            //         onLoad: (placementId) =>
+                            //             print('Banner loaded: $placementId'),
+                            //         onClick: (placementId) =>
+                            //             print('Banner clicked: $placementId'),
+                            //         onShown: (placementId) =>
+                            //             print('Banner shown: $placementId'),
+                            //         onFailed: (placementId, error, message) {
+                            //           print(
+                            //               'Banner Ad $placementId failed: $error $message');
+                            //           bannerAd != null
+                            //               ? StartAppBanner(bannerAd!)
+                            //               : const SizedBox.shrink();
+                            //         }),
+                            //   )
+                            //   else
+                            //   bannerAd != null
+                            //               ? StartAppBanner(bannerAd!)
+                            //               : const SizedBox.shrink(),
+
                             SizedBox(
                               height: 200,
                               child: ListView.builder(
@@ -824,7 +821,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _startAdTimer() {
-    _adTimer = Timer.periodic(const Duration(minutes: 7), (timer) {
+    _adTimer = Timer.periodic(const Duration(minutes: 6), (timer) {
       _showRewardedAd();
 
       if (placements[AdManager.interstitialVideoAdPlacementId] == true) {
@@ -837,13 +834,13 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _startBannerTimer() {
-    _bannerTimer = Timer.periodic(const Duration(seconds: 40), (timer) {
-      if (_showBanner) {
-        _loadAd(AdManager.bannerAdPlacementId); // Refresh the banner ad
-      } else {
-        loadbannerAd();
-      }
-    });
-  }
+  // void _startBannerTimer() {
+  //   _bannerTimer = Timer.periodic(const Duration(seconds: 40), (timer) {
+  //     if (_showBanner) {
+  //       _loadAd(AdManager.bannerAdPlacementId); // Refresh the banner ad
+  //     } else {
+  //       loadbannerAd();
+  //     }
+  //   });
+  // }
 }

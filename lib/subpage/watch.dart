@@ -204,22 +204,22 @@ class _YoutubePlayerPageState extends State<YoutubePlayerPage> {
                   ),
                 ),
               ),
-              if (_bannerAd != null)
-            SizedBox(
-              width: _bannerAd!.size.width.toDouble(),
-              height: _bannerAd!.size.height.toDouble(),
-              child: AdWidget(ad: _bannerAd!),
-            )
-          else if (_showBanner)
-            UnityBannerAd(
-                placementId: AdManager.bannerAdPlacementId,
-                onLoad: (placementId) => print('Banner loaded: $placementId'),
-                onClick: (placementId) => print('Banner clicked: $placementId'),
-                onShown: (placementId) => print('Banner shown: $placementId'),
-                onFailed: (placementId, error, message) {
-                  print('Banner Ad $placementId failed: $error $message');
-                  bannerAd != null ? StartAppBanner(bannerAd!) : Container();
-                }),
+          //     if (_bannerAd != null)
+          //   SizedBox(
+          //     width: _bannerAd!.size.width.toDouble(),
+          //     height: _bannerAd!.size.height.toDouble(),
+          //     child: AdWidget(ad: _bannerAd!),
+          //   )
+          // else if (_showBanner)
+          //   UnityBannerAd(
+          //       placementId: AdManager.bannerAdPlacementId,
+          //       onLoad: (placementId) => print('Banner loaded: $placementId'),
+          //       onClick: (placementId) => print('Banner clicked: $placementId'),
+          //       onShown: (placementId) => print('Banner shown: $placementId'),
+          //       onFailed: (placementId, error, message) {
+          //         print('Banner Ad $placementId failed: $error $message');
+          //         bannerAd != null ? StartAppBanner(bannerAd!) : Container();
+          //       }),
             ],
           ),
         ),

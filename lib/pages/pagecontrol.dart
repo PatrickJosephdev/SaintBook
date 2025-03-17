@@ -1,10 +1,8 @@
-// //
-
-// import 'package:myapp/pages/saintlist.dart';
-// import 'package:myapp/pages/settingspage.dart';
+// import 'package:saintbook/pages/saintlist.dart';
+// import 'package:saintbook/pages/settingspage.dart';
 // import 'package:flutter/material.dart';
 // import 'package:crystal_navigation_bar/crystal_navigation_bar.dart';
-// import 'package:myapp/pages/homepage.dart';
+// import 'package:saintbook/pages/homepage.dart';
 // import 'package:connectivity_plus/connectivity_plus.dart';
 
 // // Enum to handle tab navigation
@@ -66,23 +64,28 @@
 //     // Check if the current theme is dark or light
 //     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
+//     // Determine the current page based on the selected tab
+//     Widget currentPage;
+//     switch (_selectedTab) {
+//       case _SelectedTab.home:
+//         currentPage = const MyHomePage();
+//         break;
+//       case _SelectedTab.saintList:
+//         currentPage = const SaintList();
+//         break;
+//       case _SelectedTab.settings:
+//         currentPage = const SettingsPage();
+//         break;
+//     }
+
 //     return Scaffold(
-//       body: IndexedStack(
-//         index: _SelectedTab.values.indexOf(_selectedTab),
-//         children: const [
-//           MyHomePage(),
-//           SaintList(),
-//           SettingsPage(),
-//         ],
-//       ),
+//       body: currentPage, // Display the current page directly
 //       extendBody: true, // This makes the body extend to include the navbar
 //       bottomNavigationBar: CrystalNavigationBar(
 //         currentIndex: _SelectedTab.values.indexOf(_selectedTab),
 //         onTap: _handleIndexChanged,
-//         margin: const EdgeInsets.all(2),
-//         height: 50,
-//         paddingR: const EdgeInsets.symmetric(horizontal: 1, vertical: 2),
 //         marginR: const EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+//         paddingR: const EdgeInsets.only(bottom: 5, top: 5),
 //         indicatorColor:
 //             isDarkMode ? Colors.white : Colors.black, // Change indicator color
 //         backgroundColor: isDarkMode
@@ -113,6 +116,8 @@
 //     );
 //   }
 // }
+
+
 
 import 'package:saintbook/pages/saintlist.dart';
 import 'package:saintbook/pages/settingspage.dart';
@@ -180,22 +185,18 @@ class _PageControlState extends State<PageControl> {
     // Check if the current theme is dark or light
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    // Determine the current page based on the selected tab
-    Widget currentPage;
-    switch (_selectedTab) {
-      case _SelectedTab.home:
-        currentPage = const MyHomePage();
-        break;
-      case _SelectedTab.saintList:
-        currentPage = const SaintList();
-        break;
-      case _SelectedTab.settings:
-        currentPage = const SettingsPage();
-        break;
-    }
+    // Create a list of pages
+    final List<Widget> pages = [
+      const MyHomePage(),
+      const SaintList(),
+      const SettingsPage(),
+    ];
 
     return Scaffold(
-      body: currentPage, // Display the current page directly
+      body: IndexedStack(
+        index: _SelectedTab.values.indexOf(_selectedTab),
+        children: pages, // Use IndexedStack to keep the state of each page
+      ),
       extendBody: true, // This makes the body extend to include the navbar
       bottomNavigationBar: CrystalNavigationBar(
         currentIndex: _SelectedTab.values.indexOf(_selectedTab),
