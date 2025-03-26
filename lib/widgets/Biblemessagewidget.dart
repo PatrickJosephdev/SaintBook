@@ -11,6 +11,7 @@ class DailyMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
+        color: Colors.black,
         image: DecorationImage(
           image: NetworkImage(imageUrl),
           fit: BoxFit.cover, // Cover the entire container
@@ -26,7 +27,7 @@ class DailyMessage extends StatelessWidget {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+               const Text(
                 'Watch Now',
                 style: TextStyle(
                   fontSize: 32.0,
