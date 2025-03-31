@@ -1,10 +1,12 @@
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:saintbook/model/helper.dart';
 import 'package:saintbook/sub-subpage/aboutus.dart';
+import 'package:saintbook/sub-subpage/dailyreading.dart';
 import 'package:saintbook/sub-subpage/donate.dart';
 import 'package:saintbook/sub-subpage/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:saintbook/sub-subpage/meetdeveloper.dart';
+import 'package:saintbook/sub-subpage/proversionpage.dart';
 import 'package:saintbook/subpage/favorite.dart';
 import 'package:saintbook/themes/themedatastyle.dart';
 import 'package:saintbook/themes/themeprovider.dart';
@@ -81,6 +83,18 @@ class _SettingsPageState extends State<SettingsPage> {
       body: ListView(
         children: [
           ListTile(
+            leading: const Icon(Icons.book_online_rounded),
+            title: const Text('Daily Reading'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const Dailyreading()),
+              );
+              // Navigate to notifications settings page
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.favorite_rounded),
             title: const Text('Favorite'),
             onTap: () async {
@@ -150,6 +164,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 themeProvider.changeTheme();
               },
             ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.approval),
+            title: const Text('Get Pro Version'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProPage()),
+              );
+              // Navigate to notifications settings page
+            },
           ),
           if (_bannerAd != null)
             SizedBox(

@@ -32,17 +32,19 @@ class _PageControlState extends State<PageControl> {
 
   Future<void> _checkInternetConnection() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.none) {
-      _showNoConnectionSnackbar();
-    } else {
+    if (connectivityResult == ConnectivityResult.other) {
       _showNewConnectionSnackbar();
+    } else {
+      if (connectivityResult == ConnectivityResult.none) {
+        _showNoConnectionSnackbar();
+      }
     }
   }
 
   void _showNoConnectionSnackbar() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('No Internet Connection'),
+        content: Text('Make sure you are connected'),
         duration: Duration(seconds: 3),
         backgroundColor: Colors.red,
       ),

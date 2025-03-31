@@ -48,6 +48,9 @@ dependencies:
   unity_ads_plugin: ^0.3.22
   connectivity_plus: ^6.1.0
   google_mobile_ads: ^5.2.0
+  fluttertoast: ^8.2.12
+  html: ^0.15.5
+  webview_flutter: ^4.10.0
 
 dev_dependencies:
   flutter_test:
