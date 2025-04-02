@@ -1,6 +1,7 @@
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:saintbook/model/helper.dart';
 import 'package:saintbook/sub-subpage/aboutus.dart';
+import 'package:saintbook/sub-subpage/catholicprayers.dart';
 import 'package:saintbook/sub-subpage/dailyreading.dart';
 import 'package:saintbook/sub-subpage/donate.dart';
 import 'package:saintbook/sub-subpage/feedback.dart';
@@ -90,6 +91,18 @@ class _SettingsPageState extends State<SettingsPage> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => const Dailyreading()),
+              );
+              // Navigate to notifications settings page
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.book_online_rounded),
+            title: const Text('Catholic Prayers'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const Catholicprayers()),
               );
               // Navigate to notifications settings page
             },
