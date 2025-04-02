@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:saintbook/model/helper.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class Dailyreading extends StatefulWidget {
@@ -12,7 +10,6 @@ class Dailyreading extends StatefulWidget {
 
 class _DailyreadingState extends State<Dailyreading> {
   late final WebViewController _controller;
-  BannerAd? _bannerAd;
 
   @override
   void initState() {
@@ -48,33 +45,7 @@ class _DailyreadingState extends State<Dailyreading> {
     }
     return true; // Allows the default back action
   }
-  _loadBannerAd() {
-    BannerAd(
-      adUnitId: Adhelper.bannerAdUnitId,
-      request: const AdRequest(),
-      size: AdSize.fullBanner,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            _bannerAd = ad as BannerAd;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          print('Failed to load a banner ad: ${error.message}');
-          ad.dispose();
-          Future.delayed(const Duration(seconds: 5), () {
-            _loadBannerAd();
-          });
-        },
-      ),
-    ).load();
-  }
-
-  void dispose() {
-    super.dispose();
-    _bannerAd?.dispose();
-    
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -82,19 +53,7 @@ class _DailyreadingState extends State<Dailyreading> {
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(title: const Text('Bible Reading')),
-        body: Column(
-          children: [
-            if (_bannerAd != null)
-                SizedBox(
-                  width: _bannerAd!.size.width.toDouble(),
-                  height: _bannerAd!.size.height.toDouble(),
-                  child: AdWidget(ad: _bannerAd!),
-                )
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:3726685405.
-            else const SizedBox(height: 1,),
-            WebViewWidget(controller: _controller),
-          ],
-        ),
+        body: WebViewWidget(controller: _controller),
       ),
     );
   }

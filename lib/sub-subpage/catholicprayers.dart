@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:saintbook/model/helper.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -12,7 +11,6 @@ class Catholicprayers extends StatefulWidget {
 
 class _CatholicprayersState extends State<Catholicprayers> {
   late final WebViewController _controller;
-  
 
   @override
   void initState() {
@@ -26,9 +24,13 @@ class _CatholicprayersState extends State<Catholicprayers> {
             // Update loading bar.
             const CircularProgressIndicator();
           },
-          onPageStarted: (String url) {},
+          onPageStarted: (String url) {
+            const CircularProgressIndicator.adaptive();
+          },
           onPageFinished: (String url) {},
-          onHttpError: (HttpResponseError error) {},
+          onHttpError: (HttpResponseError error) {
+            const Text('No internet');
+          },
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: (NavigationRequest request) {
             if (request.url.startsWith('https://www.jkj.jhjj/')) {
@@ -60,6 +62,3 @@ class _CatholicprayersState extends State<Catholicprayers> {
     );
   }
 }
-
-
-
