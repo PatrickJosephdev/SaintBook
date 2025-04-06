@@ -4,12 +4,16 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     
-    
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     
     <application
         android:label="SaintBook"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <receiver android:name="com.dexterous.flutterlocalnotifications.receivers.NotificationReceiver"/>
+        <receiver android:name="com.dexterous.flutterlocalnotifications.receivers.ActionReceiver"/>
         
         <meta-data
             android:name="com.startapp.sdk.APPLICATION_ID"

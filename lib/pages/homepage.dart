@@ -762,7 +762,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               height: 20,
                             ),
                             const Text(
-                              'Daily Message',
+                              'Daily Catechism',
                               style: TextStyle(fontSize: 20),
                             ),
                             // if (_showBanner)
@@ -802,7 +802,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         title: message['title']);
                                   } else {
                                     return const Text(
-                                        'No Daily Message Data Available, Check your Internet Connection');
+                                        'No Catechism Message Data Available, Check your Internet Connection');
                                   }
                                 },
                               ),
