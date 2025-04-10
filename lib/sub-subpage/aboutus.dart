@@ -96,8 +96,8 @@ class AboutUsPage extends StatelessWidget {
                     icon: Image.asset(
                       'assets/facebook.jpeg',
                       fit: BoxFit.cover,
-                      height: 30,
-                      width: 30,
+                      height: 50,
+                      width: 50,
                     ), // Add your Facebook icon here
                     iconSize: 40,
                     onPressed: () => _launchURL(

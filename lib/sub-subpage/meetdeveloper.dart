@@ -55,7 +55,7 @@ class MeetTheDeveloperPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20,),
+                  const SizedBox(height: 20,),
                   Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.center,

@@ -97,7 +97,7 @@ class _CatholicprayersState extends State<Catholicprayers> {
       child: Scaffold(
         appBar: AppBar(title: const Text('Catholic Prayers')),
         body: _url == null
-            ? Center(child: CircularProgressIndicator()) // Show loading indicator while fetching URL
+            ? const Center(child: CircularProgressIndicator()) // Show loading indicator while fetching URL
             : WebViewWidget(controller: _controller),
       ),
     );

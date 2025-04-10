@@ -95,7 +95,7 @@ class _DailyreadingState extends State<Dailyreading> {
       child: Scaffold(
         appBar: AppBar(title: const Text('Bible Reading')),
         body: _url == null
-            ? Center(child: CircularProgressIndicator()) // Show loading indicator while fetching URL
+            ? const Center(child: CircularProgressIndicator()) // Show loading indicator while fetching URL
             : WebViewWidget(controller: _controller),
       ),
     );
