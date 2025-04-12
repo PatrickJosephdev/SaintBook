@@ -762,32 +762,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               height: 20,
                             ),
                             const Text(
-                              'Daily Catechism',
+                              'Daily Catechism and Messages',
                               style: TextStyle(fontSize: 20),
                             ),
-                            // if (_showBanner)
-                            //   Center(
-                            //     child: UnityBannerAd(
-                            //         placementId: AdManager.bannerAdPlacementId,
-                            //         onLoad: (placementId) =>
-                            //             print('Banner loaded: $placementId'),
-                            //         onClick: (placementId) =>
-                            //             print('Banner clicked: $placementId'),
-                            //         onShown: (placementId) =>
-                            //             print('Banner shown: $placementId'),
-                            //         onFailed: (placementId, error, message) {
-                            //           print(
-                            //               'Banner Ad $placementId failed: $error $message');
-                            //           bannerAd != null
-                            //               ? StartAppBanner(bannerAd!)
-                            //               : const SizedBox.shrink();
-                            //         }),
-                            //   )
-                            //   else
-                            //   bannerAd != null
-                            //               ? StartAppBanner(bannerAd!)
-                            //               : const SizedBox.shrink(),
-
                             SizedBox(
                               height: 200,
                               child: ListView.builder(

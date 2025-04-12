@@ -21,9 +21,10 @@ class Message extends StatelessWidget {
       // Set a fixed width for each item
       margin: const EdgeInsets.only(right: 10),
       child: Card(
-        elevation: 4,
+        elevation: 5,
         child: Stack(
           children: [
+            
             // Display the image
             Positioned.fill(
               child: ClipRRect(
@@ -33,6 +34,9 @@ class Message extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
+            ),
+            Container(
+              color: Colors.black.withOpacity(0.4),
             ),
             Positioned(
               top: 10,

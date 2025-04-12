@@ -84,7 +84,7 @@ class AboutUsPage extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               const Text(
-                'Follow Us on our Social media Pages, and also if you want us to make an App for you feel free to contact Us',
+                'Follow Us on our Social media Pages to get relevant updates, and also if you want us to make an App for you feel free to contact Us',
                 style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
@@ -107,10 +107,10 @@ class AboutUsPage extends StatelessWidget {
                     icon: Image.asset(
                       'assets/whatsapp.png',
                       fit: BoxFit.cover,
-                      height: 30,
-                      width: 30,
+                      height: 50,
+                      width: 50,
                     ), // Add your Twitter icon here
-                    iconSize: 40,
+                    iconSize: 50,
                     onPressed: () => _launchURL('https://wa.me/+2347042314717'),
                   ),
                   const SizedBox(

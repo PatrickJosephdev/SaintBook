@@ -23,7 +23,8 @@ class _DailyreadingState extends State<Dailyreading> {
 
   Future<void> _fetchUrl() async {
     try {
-      final response = await http.get(Uri.parse('https://patrickjosephdev.github.io/Book_of_Saints/readingurl.json')); // Replace with your GitHub JSON URL
+      final response = await http.get(Uri.parse(
+          'https://patrickjosephdev.github.io/Book_of_Saints/readingurl.json')); // Replace with your GitHub JSON URL
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         if (jsonData['url'] != null && jsonData['url'].isNotEmpty) {
@@ -33,12 +34,15 @@ class _DailyreadingState extends State<Dailyreading> {
           _loadWebView();
         } else {
           _showToast('URL not available right now');
+          _navigateBack();
         }
       } else {
         _showToast('Failed to fetch URL');
+        _navigateBack();
       }
     } catch (e) {
-      _showToast('Error occurred: $e');
+      _showToast('Error fetching URL: $e');
+      _navigateBack();
     }
   }
 
@@ -54,8 +58,14 @@ class _DailyreadingState extends State<Dailyreading> {
             },
             onPageStarted: (String url) {},
             onPageFinished: (String url) {},
-            onHttpError: (HttpResponseError error) {},
-            onWebResourceError: (WebResourceError error) {},
+            onHttpError: (HttpResponseError error) {
+              _showToast('HTTP Error: $error');
+              _navigateBack();
+            },
+            onWebResourceError: (WebResourceError error) {
+              _showToast('Web Resource Error: ${error.description}');
+              _navigateBack();
+            },
             onNavigationRequest: (NavigationRequest request) {
               if (request.url.startsWith('https://www.jkj.jhjj/')) {
                 return NavigationDecision.prevent;
@@ -65,7 +75,13 @@ class _DailyreadingState extends State<Dailyreading> {
           ),
         )
         ..loadRequest(Uri.parse(_url!));
+    } else {
+      _showToast('Check Your Internet');
+      _navigateBack();
     }
+  }
+  void _navigateBack() {
+    Navigator.of(context).pop(); // Navigate back to the previous page
   }
 
   void _showToast(String message) {
@@ -95,7 +111,9 @@ class _DailyreadingState extends State<Dailyreading> {
       child: Scaffold(
         appBar: AppBar(title: const Text('Bible Reading')),
         body: _url == null
-            ? const Center(child: CircularProgressIndicator()) // Show loading indicator while fetching URL
+            ? const Center(
+                child:
+                    CircularProgressIndicator()) // Show loading indicator while fetching URL
             : WebViewWidget(controller: _controller),
       ),
     );
