@@ -33,16 +33,14 @@ class _CatholicprayersState extends State<Catholicprayers> {
           });
           _loadWebView();
         } else {
-          _showToast('URL not available right now');
-          _navigateBack();
+          
+        
         }
       } else {
-        _showToast('Failed to fetch URL');
-        _navigateBack();
+        
       }
     } catch (e) {
-      _showToast('Error fetching URL: $e');
-      _navigateBack();
+      _showToast('No internet connected');
     }
   }
 
@@ -59,16 +57,15 @@ class _CatholicprayersState extends State<Catholicprayers> {
             onPageStarted: (String url) {},
             onPageFinished: (String url) {},
             onHttpError: (HttpResponseError error) {
-              _showToast('HTTP Error: $error');
-              _navigateBack();
+              _showToast('No internet connected');
+             
             },
             onWebResourceError: (WebResourceError error) {
-              _showToast('Web Resource Error: ${error.description}');
-              _navigateBack();
+              
             },
             onNavigationRequest: (NavigationRequest request) {
               if (request.url.startsWith('https://www.jkj.jhjj/')) {
-                return NavigationDecision.prevent;
+                return NavigationDecision.navigate;
               }
               return NavigationDecision.navigate;
             },
@@ -76,8 +73,7 @@ class _CatholicprayersState extends State<Catholicprayers> {
         )
         ..loadRequest(Uri.parse(_url!));
     } else {
-      _showToast('Check Your Internet');
-      _navigateBack();
+      _showToast('No internet connected');
     }
   }
 
@@ -91,7 +87,7 @@ class _CatholicprayersState extends State<Catholicprayers> {
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.red,
       textColor: Colors.white,
       fontSize: 16.0,
     );
@@ -110,7 +106,14 @@ class _CatholicprayersState extends State<Catholicprayers> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        appBar: AppBar(title: const Text('Catholic Prayers')),
+        appBar: AppBar(
+          title: const Text('Catholic Prayers'),
+          leading: IconButton(onPressed: (){
+            _navigateBack();
+          }, 
+          icon: Icon(Icons.arrow_back)
+          ),
+          ),
         body: _url == null
             ? const Center(child: CircularProgressIndicator())
             : WebViewWidget(controller: _controller),

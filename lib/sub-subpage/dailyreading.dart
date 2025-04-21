@@ -33,16 +33,16 @@ class _DailyreadingState extends State<Dailyreading> {
           });
           _loadWebView();
         } else {
-          _showToast('URL not available right now');
-          _navigateBack();
+         
+          
         }
       } else {
-        _showToast('Failed to fetch URL');
-        _navigateBack();
+        _showToast('No internet connection');
+        
       }
     } catch (e) {
-      _showToast('Error fetching URL: $e');
-      _navigateBack();
+      _showToast('No internet Connection');
+      
     }
   }
 
@@ -59,16 +59,15 @@ class _DailyreadingState extends State<Dailyreading> {
             onPageStarted: (String url) {},
             onPageFinished: (String url) {},
             onHttpError: (HttpResponseError error) {
-              _showToast('HTTP Error: $error');
-              _navigateBack();
+              _showToast('No internet Connection');
+              
             },
             onWebResourceError: (WebResourceError error) {
-              _showToast('Web Resource Error: ${error.description}');
-              _navigateBack();
+             
             },
             onNavigationRequest: (NavigationRequest request) {
               if (request.url.startsWith('https://www.jkj.jhjj/')) {
-                return NavigationDecision.prevent;
+                return NavigationDecision.navigate;
               }
               return NavigationDecision.navigate;
             },
@@ -77,9 +76,10 @@ class _DailyreadingState extends State<Dailyreading> {
         ..loadRequest(Uri.parse(_url!));
     } else {
       _showToast('Check Your Internet');
-      _navigateBack();
+      
     }
   }
+
   void _navigateBack() {
     Navigator.of(context).pop(); // Navigate back to the previous page
   }
@@ -90,7 +90,7 @@ class _DailyreadingState extends State<Dailyreading> {
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.red,
       textColor: Colors.white,
       fontSize: 16.0,
     );
@@ -109,7 +109,15 @@ class _DailyreadingState extends State<Dailyreading> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        appBar: AppBar(title: const Text('Bible Reading')),
+        appBar: AppBar(
+          title: const Text('Bible Reading'),
+          leading: IconButton(
+            onPressed: () {
+              _navigateBack();
+            },
+            icon: Icon(Icons.arrow_back),
+          ),
+        ),
         body: _url == null
             ? const Center(
                 child:

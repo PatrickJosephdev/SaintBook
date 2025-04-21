@@ -798,7 +798,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _startAdTimer() {
-    _adTimer = Timer.periodic(const Duration(minutes: 6), (timer) {
+    _adTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
       _showRewardedAd();
 
       if (placements[AdManager.interstitialVideoAdPlacementId] == true) {
